@@ -10,17 +10,27 @@ module rsa_decoder (
     );
 
 
-    parameter p = 67, q = 5, n = 3551, t = 3432, e = 5, d = 1373;
-    parameter exp_2k = 2292;  // 4096-3551=545, 545*545%3551 =2292
-    // 3551 2^10 = 1024 2^11 = 2048 2^12 = 4096
-    parameter k = 12;
-    parameter logk = 4;
-    // mod_exp
+    // ---------------------------------- 实现功能 ----------------------------------
+    // 外参
+    // -----------------------------------------------------------------------------
+    parameter n = 7'd79;
+    parameter n_bit = 7;
+    parameter logr = 3;
+    parameter p = 3'd1;
+    parameter Rmodn = 7'd49;
+    parameter R2modn = 7'd31;
+
+    // ---------------------------------- 实现功能 ----------------------------------
+    // 实例化mod_exp模块
+    // mont_result为输出结果,当mont_done为高电平时有效
+    // -----------------------------------------------------------------------------
     mod_exp #(
-                .k     (k),
-                .logk  (logk),
-                .m     (n),
-                .exp_2k(exp_2k)
+                .n     (n),
+                .n_bit (logk),
+                .logr  (logr),
+                .p     (p),
+                .Rmodn (Rmodn),
+                .R2modn(R2modn)
             ) inst_mod_exp (
                 .x    (d),
                 .y    (data_in),

@@ -1,12 +1,12 @@
 `timescale 1ns / 1ps
 module tb;
-    parameter k = 192;
-    parameter logk = 8;
-    parameter m = 192'hfffffffffffffffffffffffffffffffeffffffffffffffff;
+    // parameter n = 7'd79, n_bit = 7, logr = 3, p = 3'd1, R2modn = 7'd22;
+    // parameter n = 7'd79, n_bit = 7, logr = 4, p = 4'd1, R2modn = 7'd45;
+    parameter n = 7'd79, n_bit = 7, logr = 5, p = 5'd17, R2modn = 7'd9;
     reg clk, rst_n;
-    reg [k-1:0] x, y;
+    reg [n_bit-1:0] x, y;
     reg start;
-    wire [k-1:0] z;
+    wire [n_bit-1:0] z;
     wire done;
 
     //生成始时钟
@@ -19,9 +19,11 @@ module tb;
 
     /****************** 开始 ADD module inst ******************/
     mod_mul #(
-                .k   (k),
-                .logk(logk),
-                .m   (m)
+                .R2modn(R2modn),
+                .n     (n),
+                .n_bit (n_bit),
+                .logr  (logr),
+                .p     (p)
             ) inst_mod_mul (
                 .x    (x),
                 .y    (y),
@@ -39,54 +41,24 @@ module tb;
     end
 
     initial begin
+        start = 0;
+
         rst_n = 1;
         #(CLK_PERIOD) rst_n = 0;
         #(CLK_PERIOD) rst_n = 1;
 
         #(CLK_PERIOD);
         start = 0;
-        x = 8'Hf7;
-        y = 8'H0a;
+        x = 7'd17;
+        y = 7'd26;
         #(CLK_PERIOD);
         start = 1;
         wait (done);
 
         #(CLK_PERIOD);
         start = 0;
-        x = 192'H000000000000000100000000000000020000000000000001;
-        y = 8'H0B;
-        #(CLK_PERIOD);
-        start = 1;
-        wait (done);
-
-        #(CLK_PERIOD);
-        start = 0;
-        x = 192'H0x000000000000000000000000000000010000000000000001;
-        y = 192'H0x000000000000000000000000000000010000000000000001;
-        #(CLK_PERIOD);
-        start = 1;
-        wait (done);
-
-        #(CLK_PERIOD);
-        start = 0;
-        x = 192'H0x000000000000000000000000000000010000000000000001;
-        y = 192'H0x0000000000000000000000000000000B000000000000000B;
-        #(CLK_PERIOD);
-        start = 1;
-        wait (done);
-
-        #(CLK_PERIOD);
-        start = 0;
-        x = 196'H0x0000000000000000000000000000000B0000000000000000B;
-        y = 196'H0x0000000000000000000000000000000B0000000000000000B;
-        #(CLK_PERIOD);
-        start = 1;
-        wait (done);
-
-        #(CLK_PERIOD);
-        start = 0;
-        x = 196'H0x0000000000000000000000000000007900000000000000079;
-        y = 196'd1;
+        x = 7'd20;
+        y = 7'd28;
         #(CLK_PERIOD);
         start = 1;
         wait (done);
@@ -94,14 +66,10 @@ module tb;
         repeat (100)
             @(posedge clk) begin
          end
+
          $display("运行结束！");
         $dumpflush;
         $finish;
         $stop;
     end
 endmodule
-
-// z = 0x00000000000009A5FFFFFFFFFFFFF65A0000000000000000
-// z = ty = 0x0000000000000000000000000000000B000000000000000B
-// z = e1 = 0x000000000000000000000000000000010000000000000001
-// z = e2 = 0x0000000000000000000000000000000B000000000000000B
