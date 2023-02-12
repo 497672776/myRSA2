@@ -5,19 +5,15 @@ module tb;
     reg clk, rst_n;
     reg start;
 
-    // parameter n = 12'd3551;
-    // parameter exp_2k = 12'd2292;
-    // parameter e = 12'd5;
-    // parameter k = 12;
-    // parameter logk = 4;
-    parameter n = 7'd79;
-    parameter n_bit = 7;
+    parameter n = 12'd3551;
+    parameter n_bit = 12;
     parameter logr = 3;
     parameter p = 3'd1;
-    parameter Rmodn = 7'd49;
-    parameter R2modn = 7'd31;
-    reg  [k-1:0] data_in;
-    wire [k-1:0] data_out;
+    parameter Rmodn = 12'd545;
+    parameter R2modn = 12'd2292;
+    parameter e = 12'd5;
+    reg [n_bit-1:0] data_in;
+    wire [n_bit-1:0] data_out;
     wire done;
     // 生成始时钟
     parameter NCLK = 40;  //40ns 25Mhz
@@ -34,7 +30,8 @@ module tb;
                     .logr  (logr),
                     .p     (p),
                     .Rmodn (Rmodn),
-                    .R2modn(R2modn)
+                    .R2modn(R2modn),
+                    .e     (e)
                 ) inst_rsa_encoder (
                     .clk     (clk),
                     .rst_n   (rst_n),
@@ -56,15 +53,14 @@ module tb;
         #(NCLK) rst_n = 1;  //复位信号
 
         #(NCLK);
-        start = 0;
-        data_in = 7'd20;
-        // data_in = 12'd1234;
+        start   = 0;
+        data_in = 12'd1234;
         #(NCLK);
         start = 1;
         wait (done);
 
         #(NCLK);
-        start = 0;
+        start   = 0;
         data_in = 12'd2233;
         #(NCLK);
         start = 1;
