@@ -31,7 +31,7 @@ module tb;
                     .p     (p),
                     .Rmodn (Rmodn),
                     .R2modn(R2modn),
-                    .e     (d)
+                    .d     (d)
                 ) inst_rsa_decoder (
                     .clk     (clk),
                     .rst_n   (rst_n),
