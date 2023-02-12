@@ -107,12 +107,12 @@ module tb;
         end
     endtask
 
-    task rsa_vify;
+    task rsa_verify_file;
         begin
-            repeat(4) begin
-
+            read_cnt = 0;
+            while(read_cnt != -1) begin
                 // encoder
-                read_cnt = $fscanf(handle_data_in,"%d",encoder_data_in);	// x1
+                read_cnt = $fscanf(handle_data_in,"%d",encoder_data_in);
                 #(NCLK);
                 encoder_start = 1'b1;
                 wait(encoder_done);
@@ -124,7 +124,7 @@ module tb;
                 // compare
                 #(NCLK);
                 if(encoder_data_in == decoder_data_out)
-                    $fdisplay(handle_out, "%d encode right!\n", encoder_data_in);
+                    $fdisplay(handle_out, "%d encode right! >= %d\n", encoder_data_in, encoder_data_out);
                 else
                     $fdisplay(handle_out, "%d encode wrong!\n", encoder_data_in);
 
@@ -135,6 +135,39 @@ module tb;
         end
     endtask
 
+    task rsa_verify_once(input [n_bit-1 : 0] i);
+        begin
+            // encoder
+            encoder_data_in = i;
+            #(NCLK);
+            encoder_start = 1'b1;
+            wait(encoder_done);
+
+            // decoder
+            decoder_start = 1'b1;
+            wait(decoder_done);
+
+            // compare
+            #(NCLK);
+            if(encoder_data_in == decoder_data_out)
+                $fdisplay(handle_out, "%d encode right! => %d\n", encoder_data_in, encoder_data_out);
+            else
+                $fdisplay(handle_out, "%d encode wrong!\n", encoder_data_in);
+
+            // restart
+            encoder_start = 1'b0;
+            decoder_start = 1'b0;
+        end
+    endtask
+
+    integer i;
+    task rsa_verify_all;
+        begin
+            for(i = 0; i <= n -1; i = i + 1)begin
+                rsa_verify_once(i);
+            end
+        end
+    endtask
 
     task ending;
         begin
@@ -152,7 +185,8 @@ module tb;
         initialization;
         reset;
         open_file;
-        rsa_vify;
+        rsa_verify_file;
+        // rsa_verify_all;
         close_file;
         ending;
     end
